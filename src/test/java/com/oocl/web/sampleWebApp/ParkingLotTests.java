@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.oocl.web.sampleWebApp.WebTestUtil.getContentAsObject;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
 public class ParkingLotTests {
     @Autowired
@@ -49,9 +51,10 @@ public class ParkingLotTests {
     @Test
     public void should_add_new_parking_lot() throws Exception {
         //given
-        String newParkingLotId = "lot";
+        String newParkingLotId = "pl2";
         int newParkingLotCapacity = 50;
         String newParkingLotInJson = "{\"parkingLotId\":\"" + newParkingLotId + "\", \"capacity\":"+newParkingLotCapacity+"}";
+
         //when
         mvc.perform(post("/parkinglots")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -59,5 +62,21 @@ public class ParkingLotTests {
         )//then
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", containsString("/parkinglots/"+newParkingLotId)));
+    }
+
+
+    @Test
+    public void should_throw_exception_due_to_exceed_employeeid_length() throws Exception {
+        //given
+        String newParkingLotId = "lot";
+        int newParkingLotCapacityExceedTheMaxLimit = 1000;
+        String newParkingLotInJson = "{\"parkingLotId\":\"" + newParkingLotId + "\", \"capacity\":"+newParkingLotCapacityExceedTheMaxLimit+"}";
+
+        //when
+        mvc.perform(post("/parkinglots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newParkingLotInJson)
+        )//then
+                .andExpect(status().isBadRequest());
     }
 }

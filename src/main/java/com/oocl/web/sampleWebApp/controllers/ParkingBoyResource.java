@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
 import java.net.URI;
 
 @RestController
@@ -15,6 +16,8 @@ public class ParkingBoyResource {
 
     @Autowired
     private ParkingBoyRepository parkingBoyRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @GetMapping
     public ResponseEntity<ParkingBoyResponse[]> getAll() {
@@ -23,10 +26,10 @@ public class ParkingBoyResource {
             .toArray(ParkingBoyResponse[]::new);
         return ResponseEntity.ok(parkingBoys);
     }
-    @PostMapping
+    @PostMapping(consumes = {"application/json"})
     public ResponseEntity<String> add(@RequestBody ParkingBoy parkingBoy){
         if(parkingBoyRepository.save(parkingBoy)!=null)
-            return ResponseEntity.created(URI.create("/parkingboys/"+parkingBoy.getId())).build();
+            return ResponseEntity.created(URI.create("/parkingboys/"+parkingBoy.getEmployeeId())).build();
         else
             return ResponseEntity.badRequest().build();
     }

@@ -13,6 +13,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
 
 import static com.oocl.web.sampleWebApp.WebTestUtil.getContentAsObject;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -23,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
 public class ParkingBoyTests {
     @Autowired
@@ -31,15 +35,20 @@ public class ParkingBoyTests {
     @Autowired
     private MockMvc mvc;
 
-	@Test
-	public void should_get_parking_boys() throws Exception {
-	    // Given
+    @Autowired
+    private EntityManager entityManager;
+
+    @Test
+    public void should_get_parking_boys() throws Exception {
+        // Given
+        entityManager.clear();
         final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("pb1"));
+        parkingBoyRepository.flush();
 
         // When
         final MvcResult result = mvc.perform(MockMvcRequestBuilders
-            .get("/parkingboys"))
-            .andReturn();
+                .get("/parkingboys"))
+                .andReturn();
 
         // Then
         assertEquals(200, result.getResponse().getStatus());
@@ -49,6 +58,7 @@ public class ParkingBoyTests {
         assertEquals(1, parkingBoys.length);
         assertEquals("pb1", parkingBoys[0].getEmployeeId());
     }
+
     @Test
     public void should_add_new_parking_boy() throws Exception {
         //given
