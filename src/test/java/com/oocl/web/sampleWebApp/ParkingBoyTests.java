@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SampleWebAppApplicationTests {
+public class ParkingBoyTests {
     @Autowired
     private ParkingBoyRepository parkingBoyRepository;
 
@@ -34,7 +34,7 @@ public class SampleWebAppApplicationTests {
 	@Test
 	public void should_get_parking_boys() throws Exception {
 	    // Given
-        final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("boy"));
+        final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("pb1"));
 
         // When
         final MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -47,7 +47,7 @@ public class SampleWebAppApplicationTests {
         final ParkingBoyResponse[] parkingBoys = getContentAsObject(result, ParkingBoyResponse[].class);
 
         assertEquals(1, parkingBoys.length);
-        assertEquals("boy", parkingBoys[0].getEmployeeId());
+        assertEquals("pb1", parkingBoys[0].getEmployeeId());
     }
     @Test
     public void should_add_new_parking_boy() throws Exception {
