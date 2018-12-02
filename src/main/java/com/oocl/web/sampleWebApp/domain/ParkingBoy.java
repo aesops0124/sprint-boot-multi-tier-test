@@ -27,4 +27,3 @@ public class ParkingBoy {
         this.employeeId = employeeId;
     }
 }
-

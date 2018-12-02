@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+
 @RestController
 @RequestMapping("/parkinglots")
 public class ParkingLotResource {
+
     @Autowired
     private ParkingLotRepository parkingLotRepository;
+
     @GetMapping
     public ResponseEntity<ParkingLotResponse[]> getAll() {
         final ParkingLotResponse[] parkingLots = parkingLotRepository.findAll().stream()
@@ -22,6 +25,7 @@ public class ParkingLotResource {
                 .toArray(ParkingLotResponse[]::new);
         return ResponseEntity.ok(parkingLots);
     }
+
     @PostMapping
     public ResponseEntity<String> add(@RequestBody @Valid ParkingLot parkingLot, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
