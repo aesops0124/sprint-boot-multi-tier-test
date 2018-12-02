@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 
 import static com.oocl.web.sampleWebApp.WebTestUtil.getContentAsObject;
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -42,7 +42,7 @@ public class ParkingBoyTests {
     public void should_get_parking_boys() throws Exception {
         // Given
         entityManager.clear();
-        final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("pb1"));
+        final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("boy"));
         parkingBoyRepository.flush();
 
         // When
@@ -56,7 +56,7 @@ public class ParkingBoyTests {
         final ParkingBoyResponse[] parkingBoys = getContentAsObject(result, ParkingBoyResponse[].class);
 
         assertEquals(1, parkingBoys.length);
-        assertEquals("pb1", parkingBoys[0].getEmployeeId());
+        assertEquals("boy", parkingBoys[0].getEmployeeId());
     }
 
     @Test
@@ -71,13 +71,15 @@ public class ParkingBoyTests {
                 .content(newParkingBoyInJson)
         )//then
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("/parkingboys/" + newParkingBoyEmployeeId)));
+                .andExpect(header().string("Location", containsString("/parkingboys/"+newParkingBoyEmployeeId)));
     }
+
     @Test
     public void should_throw_exception_due_to_exceed_employeeid_length() throws Exception {
         //given
         String newParkingBoyEmployeeIdExceedMaxLength = "The employee id is a non-empty String representing the unique ID for a parking boy";
         String newParkingBoyInJson = "{\"employeeId\":" + newParkingBoyEmployeeIdExceedMaxLength + "}";
+
         //when
         mvc.perform(post("/parkingboys")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -85,19 +87,25 @@ public class ParkingBoyTests {
         )//then
                 .andExpect(status().isBadRequest());
     }
+
+
     @Test
     public void should_find_parking_boy_by_employee_id() throws Exception {
         // Given
         entityManager.clear();
         final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("boy"));
         parkingBoyRepository.flush();
+
         // When
         final MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get("/parkingboys/boy"))
                 .andReturn();
+
         // Then
         assertEquals(200, result.getResponse().getStatus());
+
         final ParkingBoyResponse parkingBoy = getContentAsObject(result, ParkingBoyResponse.class);
+
         assertEquals("boy", parkingBoy.getEmployeeId());
     }
 }
